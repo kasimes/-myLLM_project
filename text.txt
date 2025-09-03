@@ -1,0 +1,4 @@
+Yapay zekâ günümüzde birçok alanda kullanılmaya başlanmıştır. 
+Özellikle doğal dil işleme, görüntü tanıma ve otonom araç teknolojileri gibi alanlarda büyük ilerlemeler kaydedilmektedir. 
+Derin öğrenme algoritmaları sayesinde bilgisayarlar artık insanlar gibi öğrenebilmekte ve karmaşık görevleri yerine getirebilmektedir. 
+Bu durum hem endüstride hem de günlük yaşamda önemli değişikliklere yol açmaktadır.
