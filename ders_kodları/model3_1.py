@@ -7,7 +7,7 @@
 import json
 
 import torch
-from my_tokenizer import Tokenizer
+from ders_kodları.kasim_tokenizer import Tokenizer
 from torch.utils.data import DataLoader
 from text_dataset import TextDataset
 
