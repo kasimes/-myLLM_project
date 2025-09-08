@@ -38,14 +38,18 @@ class Kasim_Model(nn.Module):
         self.pos_embed = nn.Embedding(context_length, embed_dim)
         self.get_pos = get_rotary_positional_encoding
     
-        self.layers= nn.ModuleList([
+        self.layers= nn.Sequential(*[
             KasimDecoderBlock(embed_dim,num_heads, context_length)
             for _ in range(num_layers)
         ])
+        self.lm_head = nn.Linear(embed_dim,vocab_size)
        
     def forward(self, x):
+        if x.dim() == 1:
+            x = x.unsqueeze(0) 
         x= self.embedding(x)  # (batch_size, seq_len, embed_dim)
         x = self.get_pos(x)
-        for layer in self.layers:
-            x = layer(x)
+        x= self.layers(x)
+        x= self.lm_head(x)
+            
         return x
