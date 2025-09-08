@@ -1,9 +1,8 @@
 import torch
 import torch.nn as nn
-from kasim_causal_attention import KasimCausalAttention
-from kasim_multi_head_attention import Kasim_Multi_Head_Attention
-from kasim_layer_norm import KasimLayerNorm
+
 from kasim_RMSnorm import KasimRMSNorm
+from kasim_decoder_block import KasimDecoderBlock
 
 def get_rotary_positional_encoding(input: torch.Tensor, Base=10000):
     # input: (batch_size, seq_len, dim)
@@ -33,17 +32,20 @@ def get_rotary_positional_encoding(input: torch.Tensor, Base=10000):
 
 
 class Kasim_Model(nn.Module):
-    def __init__(self, vocab_size, embed_dim, context_length):
+    def __init__(self, vocab_size, embed_dim, context_length, num_heads, num_layers):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_dim)
         self.pos_embed = nn.Embedding(context_length, embed_dim)
         self.get_pos = get_rotary_positional_encoding
     
-        self.self_attention = Kasim_Multi_Head_Attention(embed_dim=embed_dim, num_heads=4, output_dim=embed_dim, context_length=context_length, dropout_rate=0.1) 
-        self.layer_norm = KasimRMSNorm(embed_dim)
-
-    def forward(self, input_ids):
-        embeddings = self.embedding(input_ids)  # (batch_size, seq_len, embed_dim)
-        embeddings = self.get_pos(embeddings)
-        embeddings = self.self_attention(embeddings)
-        return embeddings
+        self.layers= nn.ModuleList([
+            KasimDecoderBlock(embed_dim,num_heads, context_length)
+            for _ in range(num_layers)
+        ])
+       
+    def forward(self, x):
+        x= self.embedding(x)  # (batch_size, seq_len, embed_dim)
+        x = self.get_pos(x)
+        for layer in self.layers:
+            x = layer(x)
+        return x
