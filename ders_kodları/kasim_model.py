@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
 from kasim_causal_attention import KasimCausalAttention
+from kasim_multi_head_attention import Kasim_Multi_Head_Attention
+from kasim_layer_norm import KasimLayerNorm
+from kasim_RMSnorm import KasimRMSNorm
 
 def get_rotary_positional_encoding(input: torch.Tensor, Base=10000):
     # input: (batch_size, seq_len, dim)
@@ -36,7 +39,8 @@ class Kasim_Model(nn.Module):
         self.pos_embed = nn.Embedding(context_length, embed_dim)
         self.get_pos = get_rotary_positional_encoding
     
-        self.self_attention = KasimCausalAttention(embed_dim, embed_dim,context_length, dropou_rate=0.5)
+        self.self_attention = Kasim_Multi_Head_Attention(embed_dim=embed_dim, num_heads=4, output_dim=embed_dim, context_length=context_length, dropout_rate=0.1) 
+        self.layer_norm = KasimRMSNorm(embed_dim)
 
     def forward(self, input_ids):
         embeddings = self.embedding(input_ids)  # (batch_size, seq_len, embed_dim)
